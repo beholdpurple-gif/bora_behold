@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>보라: Behold</title>
+    <style>
+        h1{text-align: center;}
+        h2{text-align: center;}
+        header{position: fixed; width: 100%; z-index: -1;}
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #d5b7f2;
+            font-family: 'Georgia', serif;
+            margin-top: 125px;
+            overflow-x: hidden;
+        }
+
+        /* ── 햄버거 버튼 ── */
+        #menu-btn {
+            position: fixed;
+            top: 18px;
+            right: 24px;
+            z-index: 200;
+            background: rgba(255,255,255,0.25);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 12px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 4.5px;
+            backdrop-filter: blur(6px);
+            transition: background 0.2s;
+        }
+
+        #menu-btn:hover {
+            background: rgba(255,255,255,0.45);
+        }
+
+        #menu-btn span {
+            display: block;
+            width: 24px;
+            height: 2.5px;
+            background: #5a2a8a;
+            border-radius: 2px;
+            transition: transform 0.3s, opacity 0.3s;
+        }
+
+        /* 열렸을 때 X 모양 */
+        #menu-btn.open span:nth-child(1) {
+            transform: translateY(7.5px) rotate(45deg);
+        }
+        #menu-btn.open span:nth-child(2) {
+            opacity: 0;
+        }
+        #menu-btn.open span:nth-child(3) {
+            transform: translateY(-7.5px) rotate(-45deg);
+        }
+
+        /* ── 사이드바 ── */
+        #sidebar {
+            position: fixed;
+            top: 0;
+            right: -320px;
+            width: 280px;
+            height: 100%;
+            background: rgba(195, 150, 240, 0.55);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-left: 1px solid rgba(255,255,255,0.3);
+            z-index: 150;
+            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 80px 32px 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            box-shadow: -8px 0 32px rgba(122, 70, 216, 0.2);
+        }
+
+        #sidebar.open {
+            right: 0;
+        }
+
+        #sidebar h2 {
+            font-size: 13px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: #7a46d8;
+            margin-bottom: 16px;
+        }
+
+        #sidebar a {
+            display: block;
+            padding: 12px 16px;
+            color: #3d1a6e;
+            text-decoration: none;
+            font-size: 16px;
+            border-radius: 10px;
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        #sidebar a:hover {
+            background: rgba(255,255,255,0.4);
+            transform: translateX(-4px);
+        }
+
+        /* ── 오버레이 ── */
+        #overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(90, 42, 138, 0.15);
+            z-index: 140;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s;
+        }
+
+        #overlay.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* ── 카드 영역 ── */
+        .cards {
+            display: flex;
+            justify-content: center;
+            gap: 20%;
+            flex-wrap: wrap;
+            padding: 60px 40px;
+        }
+
+        .cards-bottom {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 0px 40px 60px;
+        }
+        .cards-bottom .menu img {
+            width: 504px;
+            height: 400px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .cards-bottom .menu a {
+            color: #3d1a6e;
+            text-decoration: none;
+            font-size: 15px;
+            transition: color 0.2s;
+        }
+
+        .cards-bottom .menu a:hover {
+            color: #a06ee0;
+        }
+
+        .cards-bottom .menu {
+            transition: transform 0.25s;
+        }
+
+        .cards-bottom .menu:hover {
+            transform: scale(1.05);
+        }
+
+        .menu {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            transition: transform 0.25s;
+        }
+
+        .menu:hover {
+            transform: translateY(-4px);
+        }
+
+        .menu a img {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 20px;
+            box-shadow: 0px 0px 20px rgb(83, 45, 153);
+            display: block;
+        }
+
+        .menu p {
+            color: #3d1a6e;
+            font-size: 15px;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                margin-top: 80px;
+            }
+
+            .cards {
+                flex-direction: row;
+                justify-content: center;
+                gap: 24px;
+                padding: 40px 20px;
+            }
+
+            .menu a img {
+                width: 130px;
+                height: 130px;
+            }
+
+            .cards-bottom {
+                padding: 0px 20px 60px;
+            }
+
+            .cards-bottom .menu img {
+                width: 100%;
+                height: auto;
+                max-width: 340px;
+            }
+        }
+    </style>
+</head>
+
+<body bgcolor="#dfd6ef">
+    <header>
+        <div class="headerimage">
+            <img style="height: 100%; width: 100%; margin: -10% 0% 0% 0%;" src="header.png">
+        </div>
+    </header>
+    <button id="menu-btn" aria-label="메뉴 열기">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    <!-- 오버레이 -->
+    <div id="overlay"></div>
+
+    <!-- 사이드바 -->
+    <nav id="sidebar">
+        <h2>Menu</h2>
+        <!-- 링크를 여기에 추가하세요 -->
+        <a href="https://www.game-ping.kr/users/%EB%B3%B4%EB%9D%BC_Behold">GamePing</a>
+        <a href="https://bora-behold.itch.io/">Itch.io</a>
+        <a href="https://x.com/Bora_Behold">Twitter</a>
+    </nav>
+
+    <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+    <div class="cards">
+        <div class="menu">
+            <a href="https://x.com/Tanpeu_"><img src="TangerinePriest.png" alt="Tangerine Priest"></a>
+            <p>Tangerine Priest</p>
+        </div>
+        <div class="menu">
+            <a href="https://x.com/ZETA_potantial"><img src="zeta.png" alt="ZETA"></a>
+            <p>ZETA</p>
+        </div>
+    </div>
+    <br><br>
+    <div class="cards-bottom">
+        <div class="menu">
+            <img src="TrustME.png" alt="Trust Me!">
+            <a href="TrustME-pc.zip" download>Trust Me!</a>
+        </div>
+        <br><br><br><br><br><br><br><br>
+        <!-- <div class="menu">
+            <img src="carmilla.png" alt="Carmilla">
+            <a href="trust_me-pc.zip" download>Carmilla</a>
+        </div> -->
+    </div>
+    <br><br><br><br>
+    <!-- <audio src="BEOMGYU's Wonder - TXT(투모로우바이투게더) (Original Song：ADOY).wav" autoplay loop></audio> -->
+    <script>
+        const img = document.querySelector('.headerimage');
+        window.addEventListener('scroll', () => {
+        const fadeEnd = window.innerHeight * 0.5;
+        const opacity = Math.max(0, 1 - scrollY / fadeEnd);
+        img.style.opacity = opacity;
+        });
+
+        const btn = document.getElementById('menu-btn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+
+        function openMenu() {
+            sidebar.classList.add('open');
+            overlay.classList.add('open');
+            btn.classList.add('open');
+        }
+
+        function closeMenu() {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('open');
+            btn.classList.remove('open');
+        }
+
+        btn.addEventListener('click', () => {
+            sidebar.classList.contains('open') ? closeMenu() : openMenu();
+        });
+
+        overlay.addEventListener('click', closeMenu);
+    </script>
+</body>
+
+</html>
